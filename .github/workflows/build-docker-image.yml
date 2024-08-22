@@ -14,8 +14,6 @@ on:
       - "**"
 jobs:
   build-and-push:
-    # Don't run just after creating repo from template
-    if: ${{ github.run_number != 1 && github.event.repository.name != 'plugin-pro-tpl' }}
     runs-on: ubuntu-latest
     services:
       verdaccio:
