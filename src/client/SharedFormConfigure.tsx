@@ -3,6 +3,7 @@ import { Breadcrumb, Button, Space } from 'antd';
 import React from 'react';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
+import { useCreateActionProps } from './useCreateActionProps';
 
 export function SharedFormConfigure() {
   const params = useParams();
@@ -35,7 +36,7 @@ export function SharedFormConfigure() {
         </Space>
       </div>
       <div style={{ maxWidth: 800, margin: '100px auto' }}>
-        <RemoteSchemaComponent uid={params.name} />
+        <RemoteSchemaComponent uid={params.name} scope={{ useCreateActionProps }} />
       </div>
     </div>
   );

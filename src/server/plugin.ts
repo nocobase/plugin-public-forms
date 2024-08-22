@@ -7,6 +7,14 @@ export class PluginSharedFormsServer extends Plugin {
   async beforeLoad() {}
 
   async load() {
+    this.app.dataSourceManager.afterAddDataSource((dataSource) => {
+      dataSource.resourceManager.registerActionHandlers({
+        publicSubmit: async (ctx, next) => {
+          ctx.body = 'ok';
+          await next();
+        },
+      });
+    });
     this.app.resourceManager.registerActionHandlers({
       'sharedForms:getMeta': async (ctx, next) => {
         const { filterByTk } = ctx.action.params;
