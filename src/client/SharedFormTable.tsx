@@ -373,13 +373,16 @@ const schema: ISchema = {
                               type: 'string',
                               'x-decorator': 'FormItem',
                               'x-component': 'CollectionField',
-                              required: true,
                             },
                             description: {
                               type: 'string',
                               'x-decorator': 'FormItem',
                               'x-component': 'CollectionField',
-                              required: true,
+                            },
+                            password: {
+                              type: 'string',
+                              'x-decorator': 'FormItem',
+                              'x-component': 'CollectionField',
                             },
                             footer: {
                               type: 'void',
