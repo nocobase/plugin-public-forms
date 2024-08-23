@@ -174,11 +174,17 @@ export class PluginSharedFormsServer extends Plugin {
     if (!ctx.action) {
       return next();
     }
+    const { actionName, resourceName, params } = ctx.action;
+    // 有密码时，跳过 token
+    if (resourceName === 'sharedForms' && actionName === 'getMeta' && params.password) {
+      return next();
+    }
     const jwt = this.app.authManager.jwt;
     const token = ctx.get('X-Form-Token');
     if (token) {
       try {
-        ctx.sharedForm = await jwt.decode(token);
+        // TODO：decode token
+        ctx.sharedForm = {};
         // 将 publicSubmit 转为 create（用于触发工作流的 Action 事件）
         const actionName = ctx.action.actionName;
         if (actionName === 'publicSubmit') {

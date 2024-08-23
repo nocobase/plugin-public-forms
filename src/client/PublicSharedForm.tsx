@@ -50,7 +50,7 @@ function PublicAPIClientProvider({ children }) {
     const apiClient = new APIClient(app.getOptions().apiClient as any);
     apiClient.app = app;
     apiClient.axios.interceptors.request.use((config) => {
-      config.headers['X-Form-Token'] = apiClient.storage.getItem('NOCOBASE_FORM_TOKEN');
+      config.headers['X-Form-Token'] = apiClient.storage.getItem('NOCOBASE_FORM_TOKEN') || '';
       return config;
     });
     return apiClient;
@@ -68,7 +68,7 @@ function InternalSharedForm() {
     {
       onSuccess(data) {
         apiClient.axios.interceptors.request.use((config) => {
-          config.headers['X-Form-Token'] = data?.data?.token;
+          config.headers['X-Form-Token'] = data?.data?.token || '';
           return config;
         });
       },
