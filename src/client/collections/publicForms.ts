@@ -25,6 +25,26 @@ export const publicFormsCollection = {
     },
     {
       type: 'string',
+      name: 'type',
+      interface: 'radioGroup',
+      uiSchema: {
+        type: 'string',
+        title: 'Type',
+        'x-component': 'Radio.Group',
+        enum: [
+          {
+            value: 'form',
+            label: 'Form',
+          },
+          {
+            value: 'stepsForm',
+            label: 'Steps form',
+          },
+        ],
+      },
+    },
+    {
+      type: 'string',
       name: 'collection',
       interface: 'collection',
       uiSchema: {

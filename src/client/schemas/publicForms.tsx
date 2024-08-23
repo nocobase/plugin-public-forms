@@ -2,6 +2,8 @@ import { uid } from '@formily/shared';
 import { ISchema } from '@nocobase/client';
 import { publicFormsCollection } from '../collections';
 import { ConfigureLink } from '../components/ConfigureLink';
+import { createActionSchema } from './createActionSchema';
+import { editActionSchema } from './editActionSchema';
 
 export const publicFormsSchema: ISchema = {
   type: 'void',
@@ -24,68 +26,7 @@ export const publicFormsSchema: ISchema = {
         },
       },
       properties: {
-        add: {
-          type: 'void',
-          'x-component': 'Action',
-          title: 'Add New',
-          'x-align': 'right',
-          'x-component-props': {
-            type: 'primary',
-          },
-          properties: {
-            drawer: {
-              type: 'void',
-              'x-component': 'Action.Drawer',
-              title: 'Add new',
-              properties: {
-                form: {
-                  type: 'void',
-                  'x-component': 'FormV2',
-                  properties: {
-                    title: {
-                      type: 'string',
-                      'x-decorator': 'FormItem',
-                      'x-component': 'CollectionField',
-                      required: true,
-                    },
-                    collection: {
-                      type: 'string',
-                      'x-decorator': 'FormItem',
-                      'x-component': 'CollectionField',
-                      required: true,
-                    },
-                    description: {
-                      type: 'string',
-                      'x-decorator': 'FormItem',
-                      'x-component': 'CollectionField',
-                    },
-                    password: {
-                      type: 'string',
-                      'x-decorator': 'FormItem',
-                      'x-component': 'CollectionField',
-                    },
-                    enabled: {
-                      type: 'string',
-                      'x-decorator': 'FormItem',
-                      'x-component': 'CollectionField',
-                    },
-                    footer: {
-                      type: 'void',
-                      'x-component': 'Action.Drawer.Footer',
-                      properties: {
-                        submit: {
-                          title: 'Submit',
-                          'x-component': 'Action',
-                          'x-use-component-props': 'useSubmitActionProps',
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        createActionSchema,
       },
     },
     table: {
@@ -163,64 +104,8 @@ export const publicFormsSchema: ISchema = {
                   type: 'void',
                   title: 'Configure',
                   'x-component': ConfigureLink,
-                  // 'x-use-component-props': 'useDeleteActionProps',
                 },
-                edit: {
-                  type: 'void',
-                  title: 'Edit',
-                  'x-component': 'Action.Link',
-                  'x-component-props': {
-                    openMode: 'drawer',
-                    icon: 'EditOutlined',
-                  },
-                  properties: {
-                    drawer: {
-                      type: 'void',
-                      title: 'Edit',
-                      'x-component': 'Action.Drawer',
-                      properties: {
-                        form: {
-                          type: 'void',
-                          'x-component': 'FormV2',
-                          'x-use-component-props': 'useEditFormProps',
-                          properties: {
-                            title: {
-                              type: 'string',
-                              'x-decorator': 'FormItem',
-                              'x-component': 'CollectionField',
-                            },
-                            description: {
-                              type: 'string',
-                              'x-decorator': 'FormItem',
-                              'x-component': 'CollectionField',
-                            },
-                            password: {
-                              type: 'string',
-                              'x-decorator': 'FormItem',
-                              'x-component': 'CollectionField',
-                            },
-                            enabled: {
-                              type: 'string',
-                              'x-decorator': 'FormItem',
-                              'x-component': 'CollectionField',
-                            },
-                            footer: {
-                              type: 'void',
-                              'x-component': 'Action.Drawer.Footer',
-                              properties: {
-                                submit: {
-                                  title: 'Submit',
-                                  'x-component': 'Action',
-                                  'x-use-component-props': 'useSubmitActionProps',
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
+                editActionSchema,
                 delete: {
                   type: 'void',
                   title: 'Delete',
