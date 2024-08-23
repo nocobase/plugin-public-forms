@@ -14,10 +14,6 @@ export default defineCollection({
     },
     {
       type: 'string',
-      name: 'dataSource',
-    },
-    {
-      type: 'string',
       name: 'collection',
     },
     {

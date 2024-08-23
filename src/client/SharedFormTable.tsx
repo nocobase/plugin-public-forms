@@ -44,17 +44,6 @@ const sharedFormsCollection = {
     },
     {
       type: 'string',
-      name: 'dataSource',
-      interface: 'input',
-      uiSchema: {
-        type: 'string',
-        title: 'Data source',
-        required: true,
-        'x-component': 'Input',
-      },
-    },
-    {
-      type: 'string',
       name: 'collection',
       interface: 'collection',
       uiSchema: {
@@ -78,6 +67,9 @@ const sharedFormsCollection = {
 };
 
 const initialSchema = (values) => {
+  const keys = values.collection.split('.');
+  const collection = keys.pop();
+  const dataSource = keys.pop() || 'main';
   return {
     type: 'void',
     name: uid(),
@@ -92,8 +84,8 @@ const initialSchema = (values) => {
         'x-component': 'CardItem',
         'x-decorator': 'FormBlockProvider',
         'x-decorator-props': {
-          collection: values.collection,
-          dataSource: values.dataSource || 'main',
+          collection,
+          dataSource,
         },
         'x-use-decorator-props': 'useCreateFormBlockDecoratorProps',
         properties: {
@@ -129,7 +121,7 @@ const initialSchema = (values) => {
         'x-component': 'Markdown.Void',
         'x-decorator': 'CardItem',
         'x-component-props': {
-          content: 'This is a demo text, **supports Markdown syntax**.',
+          content: '# Submitted Successfully\nThis is a demo text, **supports Markdown syntax**.',
         },
         'x-decorator-props': {
           name: 'markdown',
@@ -258,12 +250,6 @@ const schema: ISchema = {
                       'x-component': 'CollectionField',
                       required: true,
                     },
-                    dataSource: {
-                      type: 'string',
-                      'x-decorator': 'FormItem',
-                      'x-component': 'CollectionField',
-                      default: 'main',
-                    },
                     collection: {
                       type: 'string',
                       'x-decorator': 'FormItem',
@@ -316,18 +302,6 @@ const schema: ISchema = {
           'x-component': 'TableV2.Column',
           properties: {
             title: {
-              type: 'string',
-              'x-component': 'CollectionField',
-              'x-pattern': 'readPretty',
-            },
-          },
-        },
-        dataSource: {
-          type: 'void',
-          title: 'Data source',
-          'x-component': 'TableV2.Column',
-          properties: {
-            dataSource: {
               type: 'string',
               'x-component': 'CollectionField',
               'x-pattern': 'readPretty',
