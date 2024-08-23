@@ -13,6 +13,9 @@ export const publicFormsSchema: ISchema = {
   'x-decorator-props': {
     collection: publicFormsCollection.name,
     action: 'list',
+    params: {
+      sort: '-createdAt',
+    },
     showIndex: true,
     dragSort: false,
   },
@@ -73,6 +76,19 @@ export const publicFormsSchema: ISchema = {
               type: 'string',
               'x-component': 'CollectionField',
               'x-pattern': 'readPretty',
+            },
+          },
+        },
+        column5: {
+          type: 'void',
+          title: 'Type',
+          'x-component': 'TableV2.Column',
+          properties: {
+            type: {
+              type: 'string',
+              'x-component': 'Radio.Group',
+              'x-pattern': 'readPretty',
+              enum: '{{ formTypes }}',
             },
           },
         },

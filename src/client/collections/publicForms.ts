@@ -31,16 +31,6 @@ export const publicFormsCollection = {
         type: 'string',
         title: 'Type',
         'x-component': 'Radio.Group',
-        enum: [
-          {
-            value: 'form',
-            label: 'Form',
-          },
-          {
-            value: 'stepsForm',
-            label: 'Steps form',
-          },
-        ],
       },
     },
     {

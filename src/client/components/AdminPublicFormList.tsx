@@ -1,15 +1,18 @@
-import { ExtendCollectionsProvider, SchemaComponent } from '@nocobase/client';
-import React from 'react';
+import { ExtendCollectionsProvider, SchemaComponent, usePlugin } from '@nocobase/client';
+import React, { useMemo } from 'react';
+import PluginPublicFormsClient from '..';
 import { publicFormsCollection } from '../collections';
 import { useDeleteActionProps, useEditFormProps, useSubmitActionProps } from '../hooks';
 import { publicFormsSchema } from '../schemas';
 
 export const AdminPublicFormList = () => {
+  const plugin = usePlugin(PluginPublicFormsClient);
+  const formTypes = useMemo(() => plugin.getFormTypeOptions(), [plugin]);
   return (
     <ExtendCollectionsProvider collections={[publicFormsCollection]}>
       <SchemaComponent
         schema={publicFormsSchema}
-        scope={{ useSubmitActionProps, useEditFormProps, useDeleteActionProps }}
+        scope={{ formTypes, useSubmitActionProps, useEditFormProps, useDeleteActionProps }}
       />
     </ExtendCollectionsProvider>
   );

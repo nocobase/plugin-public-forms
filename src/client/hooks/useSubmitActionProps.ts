@@ -6,54 +6,17 @@ import {
   useCollection,
   useDataBlockRequest,
   useDataBlockResource,
+  usePlugin,
 } from '@nocobase/client';
 import { App as AntdApp } from 'antd';
+import PluginPublicFormsClient from '..';
 
-const initialSchema = (values) => {
-  const keys = values.collection.split('.');
-  const collection = keys.pop();
-  const dataSource = keys.pop() || 'main';
+const initialSchema = (values, formSchema) => {
   return {
     type: 'void',
     name: uid(),
     properties: {
-      form: {
-        type: 'void',
-        'x-toolbar': 'BlockSchemaToolbar',
-        'x-toolbar-props': {
-          draggable: false,
-        },
-        'x-settings': 'blockSettings:createForm',
-        'x-component': 'CardItem',
-        'x-decorator': 'FormBlockProvider',
-        'x-decorator-props': {
-          collection,
-          dataSource,
-        },
-        'x-use-decorator-props': 'useCreateFormBlockDecoratorProps',
-        properties: {
-          a69vmspkv8h: {
-            type: 'void',
-            'x-component': 'FormV2',
-            'x-use-component-props': 'useCreateFormBlockProps',
-            properties: {
-              grid: {
-                type: 'void',
-                'x-component': 'Grid',
-                'x-initializer': 'form:configureFields',
-              },
-              l9xfwp6cfh1: {
-                type: 'void',
-                'x-component': 'ActionBar',
-                'x-initializer': 'createForm:configureActions',
-                'x-component-props': {
-                  layout: 'one-column',
-                },
-              },
-            },
-          },
-        },
-      },
+      form: formSchema,
       success: {
         type: 'void',
         'x-editable': false,
@@ -83,6 +46,7 @@ export const useSubmitActionProps = () => {
   const { runAsync } = useDataBlockRequest();
   const collection = useCollection();
   const api = useAPIClient();
+  const plugin = usePlugin(PluginPublicFormsClient);
   return {
     type: 'primary',
     async onClick() {
@@ -95,7 +59,17 @@ export const useSubmitActionProps = () => {
         });
       } else {
         const key = uid();
-        const schema = initialSchema(values);
+        const uiSchemaCallback = plugin.getFormSchemaByType(values.type);
+        const keys = values.collection.split('.');
+        const collection = keys.pop();
+        const dataSource = keys.pop() || 'main';
+        const schema = initialSchema(
+          values,
+          uiSchemaCallback({
+            collection,
+            dataSource,
+          }),
+        );
         schema['x-uid'] = key;
         await resource.create({
           values: {
