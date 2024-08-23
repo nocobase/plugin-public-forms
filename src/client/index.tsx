@@ -1,24 +1,24 @@
 import { Plugin } from '@nocobase/client';
-import { PublicSharedForm } from './PublicSharedForm';
-import { SharedFormConfigure } from './SharedFormConfigure';
-import { SharedFormTable } from './SharedFormTable';
+import { AdminPublicFormList } from './components/AdminPublicFormList';
+import { AdminPublicFormPage } from './components/AdminPublicFormPage';
+import { PublicFormPage } from './components/PublicFormPage';
 
 export class PluginSharedFormsClient extends Plugin {
   async load() {
-    this.app.router.add('shared-forms', {
-      path: '/shared-forms/:name',
-      Component: PublicSharedForm,
+    this.app.router.add('public-forms', {
+      path: '/public-forms/:name',
+      Component: PublicFormPage,
     });
-    this.app.pluginSettingsManager.add('shared-forms', {
-      title: 'Shared forms',
+    this.app.pluginSettingsManager.add('public-forms', {
+      title: 'Public forms',
       icon: 'TableOutlined',
-      Component: SharedFormTable,
+      Component: AdminPublicFormList,
     });
-    this.app.pluginSettingsManager.add(`shared-forms/:name`, {
+    this.app.pluginSettingsManager.add(`public-forms/:name`, {
       title: false,
-      pluginKey: 'shared-forms',
+      pluginKey: 'public-forms',
       isTopLevel: false,
-      Component: SharedFormConfigure,
+      Component: AdminPublicFormPage,
     });
   }
 }

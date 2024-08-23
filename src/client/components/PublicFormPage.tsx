@@ -5,6 +5,7 @@ import {
   DataSource,
   DataSourceApplicationProvider,
   DataSourceManager,
+  PoweredBy,
   SchemaComponent,
   SchemaComponentContext,
   useAPIClient,
@@ -14,7 +15,7 @@ import {
 import { Input, Modal, Spin } from 'antd';
 import React, { useContext, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
-import { useCreateActionProps } from './useCreateActionProps';
+import { usePublicSubmitActionProps } from '../hooks';
 
 class PublicDataSource extends DataSource {
   async getDataSource() {
@@ -22,7 +23,7 @@ class PublicDataSource extends DataSource {
   }
 }
 
-function PublicSharedFormProvider(props) {
+function PublicPublicFormProvider(props) {
   const { dataSource } = props;
   const app = useApp();
   const [dataSourceManager, collectionManager] = useMemo(() => {
@@ -50,7 +51,9 @@ function PublicAPIClientProvider({ children }) {
     const apiClient = new APIClient(app.getOptions().apiClient as any);
     apiClient.app = app;
     apiClient.axios.interceptors.request.use((config) => {
-      config.headers['X-Form-Token'] = apiClient.storage.getItem('NOCOBASE_FORM_TOKEN') || '';
+      if (config.headers) {
+        config.headers['X-Form-Token'] = apiClient.storage.getItem('NOCOBASE_FORM_TOKEN') || '';
+      }
       return config;
     });
     return apiClient;
@@ -58,17 +61,19 @@ function PublicAPIClientProvider({ children }) {
   return <APIClientProvider apiClient={apiClient}>{children}</APIClientProvider>;
 }
 
-function InternalSharedForm() {
+function InternalPublicForm() {
   const params = useParams();
   const apiClient = useAPIClient();
   const { error, data, loading, run } = useRequest<any>(
     {
-      url: `sharedForms:getMeta/${params.name}`,
+      url: `publicForms:getMeta/${params.name}`,
     },
     {
       onSuccess(data) {
         apiClient.axios.interceptors.request.use((config) => {
-          config.headers['X-Form-Token'] = data?.data?.token || '';
+          if (config.headers) {
+            config.headers['X-Form-Token'] = data?.data?.token || '';
+          }
           return config;
         });
       },
@@ -77,7 +82,6 @@ function InternalSharedForm() {
   const [pwd, setPwd] = useState('');
   const ctx = useContext(SchemaComponentContext);
   if (error) {
-    console.log(error);
     if (error?.['response']?.status === 401) {
       return (
         <div>
@@ -94,7 +98,7 @@ function InternalSharedForm() {
               });
             }}
           >
-            <Input
+            <Input.Password
               onChange={(e) => {
                 setPwd(e.target.value);
               }}
@@ -117,20 +121,21 @@ function InternalSharedForm() {
       }}
     >
       <div style={{ maxWidth: 800, margin: '0 auto', paddingTop: '10vh' }}>
-        <PublicSharedFormProvider dataSource={data?.data?.dataSource}>
+        <PublicPublicFormProvider dataSource={data?.data?.dataSource}>
           <SchemaComponentContext.Provider value={{ ...ctx, designable: false }}>
-            <SchemaComponent schema={data?.data?.schema} scope={{ useCreateActionProps }} />
+            <SchemaComponent schema={data?.data?.schema} scope={{ useCreateActionProps: usePublicSubmitActionProps }} />
           </SchemaComponentContext.Provider>
-        </PublicSharedFormProvider>
+        </PublicPublicFormProvider>
+        <PoweredBy />
       </div>
     </div>
   );
 }
 
-export function PublicSharedForm() {
+export function PublicFormPage() {
   return (
     <PublicAPIClientProvider>
-      <InternalSharedForm />
+      <InternalPublicForm />
     </PublicAPIClientProvider>
   );
 }

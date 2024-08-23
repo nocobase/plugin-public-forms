@@ -4,20 +4,20 @@ import { Plugin } from '@nocobase/server';
 
 class PasswordError extends Error {}
 
-export class PluginSharedFormsServer extends Plugin {
+export class PluginPublicFormsServer extends Plugin {
   // TODO
   async getMetaByTk(filterByTk: string, options: { password?: string; token?: string }) {
     const { token, password } = options;
-    const sharedForms = this.db.getRepository('sharedForms');
+    const publicForms = this.db.getRepository('publicForms');
     const uiSchema = this.db.getRepository<UiSchemaRepository>('uiSchemas');
-    const instance = await sharedForms.findOne({
+    const instance = await publicForms.findOne({
       filter: {
-        slug: filterByTk,
+        key: filterByTk,
       },
     });
     if (!token) {
       if (instance.get('password')) {
-        const Password = sharedForms.collection.getField<PasswordField>('password');
+        const Password = publicForms.collection.getField<PasswordField>('password');
         const r = await Password.verify(password, instance.get('password'));
         if (!r) {
           throw new PasswordError('Please enter your password');
@@ -154,7 +154,7 @@ export class PluginSharedFormsServer extends Plugin {
   }
 
   // TODO
-  getSharedFormsMeta = async (ctx, next) => {
+  getPublicFormsMeta = async (ctx, next) => {
     const token = ctx.get('X-Form-Token');
     const { filterByTk, password } = ctx.action.params;
     try {
@@ -176,7 +176,7 @@ export class PluginSharedFormsServer extends Plugin {
     }
     const { actionName, resourceName, params } = ctx.action;
     // 有密码时，跳过 token
-    if (resourceName === 'sharedForms' && actionName === 'getMeta' && params.password) {
+    if (resourceName === 'publicForms' && actionName === 'getMeta' && params.password) {
       return next();
     }
     const jwt = this.app.authManager.jwt;
@@ -184,7 +184,7 @@ export class PluginSharedFormsServer extends Plugin {
     if (token) {
       try {
         // TODO：decode token
-        ctx.sharedForm = {};
+        ctx.PublicForm = {};
         // 将 publicSubmit 转为 create（用于触发工作流的 Action 事件）
         const actionName = ctx.action.actionName;
         if (actionName === 'publicSubmit') {
@@ -199,7 +199,7 @@ export class PluginSharedFormsServer extends Plugin {
 
   // TODO：用于处理哪些可选项的接口可以访问
   parseACL = async (ctx, next) => {
-    if (ctx.sharedForm) {
+    if (ctx.PublicForm) {
       ctx.permission = {
         skip: true,
       };
@@ -208,9 +208,9 @@ export class PluginSharedFormsServer extends Plugin {
   };
 
   async load() {
-    this.app.acl.allow('sharedForms', 'getMeta', 'public');
+    this.app.acl.allow('publicForms', 'getMeta', 'public');
     this.app.resourceManager.registerActionHandlers({
-      'sharedForms:getMeta': this.getSharedFormsMeta,
+      'publicForms:getMeta': this.getPublicFormsMeta,
     });
     this.app.dataSourceManager.afterAddDataSource((dataSource) => {
       dataSource.resourceManager.use(this.parseToken, {
@@ -234,4 +234,4 @@ export class PluginSharedFormsServer extends Plugin {
   async remove() {}
 }
 
-export default PluginSharedFormsServer;
+export default PluginPublicFormsServer;

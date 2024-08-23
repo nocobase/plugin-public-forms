@@ -1,12 +1,13 @@
 import { defineCollection } from '@nocobase/database';
 
 export default defineCollection({
-  name: 'sharedForms',
-  filterTargetKey: 'slug',
+  name: 'publicForms',
+  filterTargetKey: 'key',
   fields: [
     {
       type: 'uid',
-      name: 'slug',
+      name: 'key',
+      unique: true,
     },
     {
       type: 'string',

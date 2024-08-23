@@ -1,13 +1,19 @@
 import { EyeOutlined, SettingOutlined } from '@ant-design/icons';
-import { RemoteSchemaComponent } from '@nocobase/client';
-import { Breadcrumb, Button, Dropdown, Space, Switch } from 'antd';
+import { PoweredBy, RemoteSchemaComponent, useRequest } from '@nocobase/client';
+import { Breadcrumb, Button, Dropdown, Space, Spin, Switch } from 'antd';
 import React from 'react';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-import { useCreateActionProps } from './useCreateActionProps';
+import { usePublicSubmitActionProps } from '../hooks';
 
-export function SharedFormConfigure() {
+export function AdminPublicFormPage() {
   const params = useParams();
+  const { error, data, loading } = useRequest<any>({
+    url: `publicForms:get/${params.name}`,
+  });
+  if (loading) {
+    return <Spin />;
+  }
   return (
     <div>
       <div
@@ -23,7 +29,7 @@ export function SharedFormConfigure() {
         <Breadcrumb
           items={[
             {
-              title: <Link to={`/admin/settings/shared-forms`}>Shared forms</Link>,
+              title: <Link to={`/admin/settings/public-forms`}>Public forms</Link>,
             },
             {
               title: 'Test',
@@ -31,7 +37,7 @@ export function SharedFormConfigure() {
           ]}
         />
         <Space>
-          <Link target={'_blank'} to={`/shared-forms/${params.name}`}>
+          <Link target={'_blank'} to={`/public-forms/${params.name}`}>
             <Button icon={<EyeOutlined />}>Open form</Button>
           </Link>
           <Dropdown
@@ -41,7 +47,7 @@ export function SharedFormConfigure() {
                   key: 'enabled',
                   label: (
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span>Enable form</span> <Switch size={'small'} />
+                      <span>Enable form</span> <Switch defaultChecked size={'small'} />
                     </span>
                   ),
                 },
@@ -69,7 +75,8 @@ export function SharedFormConfigure() {
         </Space>
       </div>
       <div style={{ maxWidth: 800, margin: '100px auto' }}>
-        <RemoteSchemaComponent uid={params.name} scope={{ useCreateActionProps }} />
+        <RemoteSchemaComponent uid={params.name} scope={{ useCreateActionProps: usePublicSubmitActionProps }} />
+        <PoweredBy />
       </div>
     </div>
   );

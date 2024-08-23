@@ -1,1 +1,1 @@
-# @nocobase-sample/plugin-shared-forms
+# @nocobase-sample/plugin-public-forms

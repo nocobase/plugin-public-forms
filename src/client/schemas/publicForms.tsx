@@ -1,217 +1,15 @@
-import { createForm } from '@formily/core';
-import { useForm } from '@formily/react';
 import { uid } from '@formily/shared';
-import {
-  ActionProps,
-  ExtendCollectionsProvider,
-  ISchema,
-  SchemaComponent,
-  useActionContext,
-  useAPIClient,
-  useCollection,
-  useCollectionRecordData,
-  useDataBlockRequest,
-  useDataBlockResource,
-} from '@nocobase/client';
-import { App as AntdApp } from 'antd';
-import React, { useMemo } from 'react';
-import { ConfigureLink } from './ConfigureLink';
+import { ISchema } from '@nocobase/client';
+import { publicFormsCollection } from '../collections';
+import { ConfigureLink } from '../components/ConfigureLink';
 
-const sharedFormsCollection = {
-  name: 'sharedForms',
-  filterTargetKey: 'slug',
-  fields: [
-    {
-      type: 'string',
-      name: 'title',
-      interface: 'input',
-      uiSchema: {
-        type: 'string',
-        title: 'Title',
-        required: true,
-        'x-component': 'Input',
-      },
-    },
-    {
-      type: 'text',
-      name: 'description',
-      interface: 'textarea',
-      uiSchema: {
-        type: 'string',
-        title: 'Description',
-        'x-component': 'Input.TextArea',
-      },
-    },
-    {
-      type: 'string',
-      name: 'collection',
-      interface: 'collection',
-      uiSchema: {
-        type: 'string',
-        title: 'Collection',
-        required: true,
-        'x-component': 'CollectionSelect',
-      },
-    },
-    {
-      type: 'password',
-      name: 'password',
-      interface: 'password',
-      uiSchema: {
-        type: 'string',
-        title: 'Password',
-        'x-component': 'Password',
-      },
-    },
-  ],
-};
-
-const initialSchema = (values) => {
-  const keys = values.collection.split('.');
-  const collection = keys.pop();
-  const dataSource = keys.pop() || 'main';
-  return {
-    type: 'void',
-    name: uid(),
-    properties: {
-      form: {
-        type: 'void',
-        'x-toolbar': 'BlockSchemaToolbar',
-        'x-toolbar-props': {
-          draggable: false,
-        },
-        'x-settings': 'blockSettings:createForm',
-        'x-component': 'CardItem',
-        'x-decorator': 'FormBlockProvider',
-        'x-decorator-props': {
-          collection,
-          dataSource,
-        },
-        'x-use-decorator-props': 'useCreateFormBlockDecoratorProps',
-        properties: {
-          a69vmspkv8h: {
-            type: 'void',
-            'x-component': 'FormV2',
-            'x-use-component-props': 'useCreateFormBlockProps',
-            properties: {
-              grid: {
-                type: 'void',
-                'x-component': 'Grid',
-                'x-initializer': 'form:configureFields',
-              },
-              l9xfwp6cfh1: {
-                type: 'void',
-                'x-component': 'ActionBar',
-                'x-initializer': 'createForm:configureActions',
-                'x-component-props': {
-                  layout: 'one-column',
-                },
-              },
-            },
-          },
-        },
-      },
-      success: {
-        type: 'void',
-        'x-editable': false,
-        'x-toolbar-props': {
-          draggable: false,
-        },
-        'x-settings': 'blockSettings:markdown',
-        'x-component': 'Markdown.Void',
-        'x-decorator': 'CardItem',
-        'x-component-props': {
-          content: '# Submitted Successfully\nThis is a demo text, **supports Markdown syntax**.',
-        },
-        'x-decorator-props': {
-          name: 'markdown',
-          engine: 'handlebars',
-        },
-      },
-    },
-  };
-};
-
-const useSubmitActionProps = () => {
-  const { setVisible } = useActionContext();
-  const { message } = AntdApp.useApp();
-  const form = useForm();
-  const resource = useDataBlockResource();
-  const { runAsync } = useDataBlockRequest();
-  const collection = useCollection();
-  const api = useAPIClient();
-  return {
-    type: 'primary',
-    async onClick() {
-      await form.submit();
-      const values = form.values;
-      if (values[collection.filterTargetKey]) {
-        await resource.update({
-          values,
-          filterByTk: values[collection.filterTargetKey],
-        });
-      } else {
-        const slug = uid();
-        const schema = initialSchema(values);
-        schema['x-uid'] = slug;
-        await resource.create({
-          values: {
-            ...values,
-            slug,
-          },
-        });
-        await api.resource('uiSchemas').insert({ values: schema });
-      }
-      await runAsync();
-      message.success('Saved successfully!');
-      setVisible(false);
-    },
-  };
-};
-
-const useEditFormProps = () => {
-  const recordData = useCollectionRecordData();
-  const form = useMemo(
-    () =>
-      createForm({
-        initialValues: recordData,
-      }),
-    [],
-  );
-
-  return {
-    form,
-  };
-};
-
-function useDeleteActionProps(): ActionProps {
-  const { message } = AntdApp.useApp();
-  const record = useCollectionRecordData();
-  const resource = useDataBlockResource();
-  const { runAsync } = useDataBlockRequest();
-  const collection = useCollection();
-  return {
-    confirm: {
-      title: 'Delete',
-      content: 'Are you sure you want to delete it?',
-    },
-    async onClick() {
-      await resource.destroy({
-        filterByTk: record[collection.filterTargetKey],
-      });
-      await runAsync();
-      message.success('Deleted!');
-    },
-  };
-}
-
-const schema: ISchema = {
+export const publicFormsSchema: ISchema = {
   type: 'void',
   name: uid(),
   'x-component': 'CardItem',
   'x-decorator': 'TableBlockProvider',
   'x-decorator-props': {
-    collection: sharedFormsCollection.name,
+    collection: publicFormsCollection.name,
     action: 'list',
     showIndex: true,
     dragSort: false,
@@ -266,6 +64,11 @@ const schema: ISchema = {
                       'x-decorator': 'FormItem',
                       'x-component': 'CollectionField',
                     },
+                    enabled: {
+                      type: 'string',
+                      'x-decorator': 'FormItem',
+                      'x-component': 'CollectionField',
+                    },
                     footer: {
                       type: 'void',
                       'x-component': 'Action.Drawer.Footer',
@@ -290,7 +93,7 @@ const schema: ISchema = {
       'x-component': 'TableV2',
       'x-use-component-props': 'useTableBlockProps',
       'x-component-props': {
-        rowKey: sharedFormsCollection.filterTargetKey,
+        rowKey: publicFormsCollection.filterTargetKey,
         rowSelection: {
           type: 'checkbox',
         },
@@ -326,6 +129,18 @@ const schema: ISchema = {
           'x-component': 'TableV2.Column',
           properties: {
             description: {
+              type: 'string',
+              'x-component': 'CollectionField',
+              'x-pattern': 'readPretty',
+            },
+          },
+        },
+        column3: {
+          type: 'void',
+          title: 'Enabled',
+          'x-component': 'TableV2.Column',
+          properties: {
+            enabled: {
               type: 'string',
               'x-component': 'CollectionField',
               'x-pattern': 'readPretty',
@@ -384,6 +199,11 @@ const schema: ISchema = {
                               'x-decorator': 'FormItem',
                               'x-component': 'CollectionField',
                             },
+                            enabled: {
+                              type: 'string',
+                              'x-decorator': 'FormItem',
+                              'x-component': 'CollectionField',
+                            },
                             footer: {
                               type: 'void',
                               'x-component': 'Action.Drawer.Footer',
@@ -414,12 +234,4 @@ const schema: ISchema = {
       },
     },
   },
-};
-
-export const SharedFormTable = () => {
-  return (
-    <ExtendCollectionsProvider collections={[sharedFormsCollection]}>
-      <SchemaComponent schema={schema} scope={{ useSubmitActionProps, useEditFormProps, useDeleteActionProps }} />
-    </ExtendCollectionsProvider>
-  );
 };
