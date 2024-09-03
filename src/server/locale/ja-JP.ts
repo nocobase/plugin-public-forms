@@ -7,4 +7,7 @@
  * For more information, please refer to: https://www.nocobase.com/agreement.
  */
 
-export { AuthModel, BasicAuth, default } from './server';
+export default {
+  'Please fill in your email address': 'メールアドレスを入力してください',
+  'The password is incorrect, please re-enter': 'パスワードが正しくありません。再度入力してください。',
+};

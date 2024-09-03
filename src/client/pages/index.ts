@@ -7,4 +7,6 @@
  * For more information, please refer to: https://www.nocobase.com/agreement.
  */
 
-export { AuthModel, BasicAuth, default } from './server';
+export * from './AuthLayout';
+export * from './SignInPage';
+export * from './SignUpPage';

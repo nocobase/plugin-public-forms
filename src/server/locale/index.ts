@@ -7,4 +7,6 @@
  * For more information, please refer to: https://www.nocobase.com/agreement.
  */
 
-export { AuthModel, BasicAuth, default } from './server';
+export { default as enUS } from './en-US';
+export { default as zhCN } from './zh-CN';
+export { default as ptBR } from './pt-BR';

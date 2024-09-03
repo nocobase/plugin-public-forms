@@ -7,4 +7,9 @@
  * For more information, please refer to: https://www.nocobase.com/agreement.
  */
 
-export { AuthModel, BasicAuth, default } from './server';
+// @ts-ignore
+import { name } from '../package.json';
+export const presetAuthType = 'Lw/Phone/Password/Sms';
+export const presetAuthenticator = 'lewanyun';
+
+export const namespace = name;

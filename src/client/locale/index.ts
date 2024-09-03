@@ -7,4 +7,10 @@
  * For more information, please refer to: https://www.nocobase.com/agreement.
  */
 
-export { AuthModel, BasicAuth, default } from './server';
+import { useTranslation } from 'react-i18next';
+
+export const NAMESPACE = 'auth';
+
+export function useAuthTranslation() {
+  return useTranslation([NAMESPACE, 'client'], { nsMode: 'fallback' });
+}
