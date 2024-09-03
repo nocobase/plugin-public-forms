@@ -1,54 +1,80 @@
-import { ISchema, Plugin } from '@nocobase/client';
-import { AdminPublicFormList } from './components/AdminPublicFormList';
-import { AdminPublicFormPage } from './components/AdminPublicFormPage';
-import { PublicFormPage } from './components/PublicFormPage';
-import { formSchemaCallback } from './schemas/formSchemaCallback';
+/**
+ * This file is part of the NocoBase (R) project.
+ * Copyright (c) 2020-2024 NocoBase Co., Ltd.
+ * Authors: NocoBase Team.
+ *
+ * This project is dual-licensed under AGPL-3.0 and NocoBase Commercial License.
+ * For more information, please refer to: https://www.nocobase.com/agreement.
+ */
 
-export class PluginPublicFormsClient extends Plugin {
-  protected formTypes = new Map();
+import { Plugin } from '@nocobase/client';
+import { Registry } from '@nocobase/utils/client';
+import { ComponentType } from 'react';
+import { presetAuthType } from '../preset';
+import { AuthProvider } from './AuthProvider';
+import { Authenticator as AuthenticatorType } from './authenticator';
+import { Options, SignInForm, SignUpForm } from './basic';
+import { NAMESPACE } from './locale';
+import { AuthLayout, SignInPage, SignUpPage } from './pages';
+import { Authenticator } from './settings/Authenticator';
+export { AuthenticatorsContextProvider, AuthLayout } from './pages/AuthLayout';
 
-  registerFormType(type: string, options: { label: string; uiSchema: (options: any) => ISchema }) {
-    this.formTypes.set(type, options);
-  }
+export type AuthOptions = {
+  components: Partial<{
+    SignInForm: ComponentType<{ authenticator: AuthenticatorType }>;
+    SignInButton: ComponentType<{ authenticator: AuthenticatorType }>;
+    SignUpForm: ComponentType<{ authenticatorName: string }>;
+    AdminSettingsForm: ComponentType;
+  }>;
+};
 
-  getFormSchemaByType(type = 'form') {
-    if (this.formTypes.get(type)) {
-      return this.formTypes.get(type).uiSchema;
-    }
-    return () => {
-      return null;
-    };
-  }
+export class PluginAuthClient extends Plugin {
+  authTypes = new Registry<AuthOptions>();
 
-  getFormTypeOptions() {
-    const options = [];
-    for (const [value, { label }] of this.formTypes) {
-      options.push({ value, label });
-    }
-    return options;
+  registerType(authType: string, options: AuthOptions) {
+    this.authTypes.register(authType, options);
   }
 
   async load() {
-    this.registerFormType('form', {
-      label: 'Form',
-      uiSchema: formSchemaCallback,
+    this.app.pluginSettingsManager.add(NAMESPACE, {
+      icon: 'LoginOutlined',
+      title: `{{t("Authentication", { ns: "${NAMESPACE}" })}}`,
+      Component: Authenticator,
+      aclSnippet: 'pm.auth.authenticators',
     });
-    this.app.router.add('public-forms', {
-      path: '/public-forms/:name',
-      Component: PublicFormPage,
+
+    this.router.add('auth', {
+      Component: 'AuthLayout',
     });
-    this.app.pluginSettingsManager.add('public-forms', {
-      title: '公共表单',
-      icon: 'TableOutlined',
-      Component: AdminPublicFormList,
+    this.router.add('auth.signin', {
+      path: '/signin',
+      Component: 'SignInPage',
     });
-    this.app.pluginSettingsManager.add(`public-forms/:name`, {
-      title: false,
-      pluginKey: 'public-forms',
-      isTopLevel: false,
-      Component: AdminPublicFormPage,
+    this.router.add('auth.signup', {
+      path: '/signup',
+      Component: 'SignUpPage',
+    });
+
+    this.app.addComponents({
+      AuthLayout,
+      SignInPage,
+      SignUpPage,
+    });
+
+    this.app.providers.unshift([AuthProvider, {}]);
+
+    this.registerType(presetAuthType, {
+      components: {
+        SignInForm: SignInForm,
+        SignUpForm: SignUpForm,
+        AdminSettingsForm: Options,
+      },
     });
   }
 }
 
-export default PluginPublicFormsClient;
+export { AuthenticatorsContext, useAuthenticator } from './authenticator';
+export type { Authenticator } from './authenticator';
+export { useSignIn } from './basic';
+
+export default PluginAuthClient;
