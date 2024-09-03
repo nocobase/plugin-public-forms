@@ -1,12 +1,13 @@
 import { defineCollection } from '@nocobase/database';
 
 export default defineCollection({
-  name: 'sharedForms',
-  filterTargetKey: 'slug',
+  name: 'publicForms',
+  filterTargetKey: 'key',
   fields: [
     {
       type: 'uid',
-      name: 'slug',
+      name: 'key',
+      unique: true,
     },
     {
       type: 'string',
@@ -14,7 +15,7 @@ export default defineCollection({
     },
     {
       type: 'string',
-      name: 'dataSource',
+      name: 'type',
     },
     {
       type: 'string',
@@ -23,6 +24,10 @@ export default defineCollection({
     {
       type: 'string',
       name: 'description',
+    },
+    {
+      type: 'boolean',
+      name: 'enabled',
     },
     {
       type: 'password',
